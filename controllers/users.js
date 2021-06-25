@@ -25,4 +25,30 @@ const createUser = (req, res) => {
     }));
 };
 
-module.exports = { getUsers, getUserId, createUser };
+const updateUserProfile = (req, res) => {
+  const { name, about } = req.body;
+  const owner = req.user._id;
+  User.findByIdAndUpdate(owner, { name, about }, { new: true })
+    .then((user) => res.send(user))
+    .catch((err) => res.status(500).send({
+      message: 'Произошла ошибка',
+    }));
+};
+
+const updateUserAvatar = (req, res) => {
+  const { avatar } = req.body;
+  const owner = req.user._id;
+  User.findByIdAndUpdate(owner, { avatar }, { new: true })
+    .then((user) => res.send(user))
+    .catch((err) => res.status(500).send({
+      message: 'Произошла ошибка',
+    }));
+};
+
+module.exports = {
+  getUsers,
+  getUserId,
+  createUser,
+  updateUserProfile,
+  updateUserAvatar,
+};
