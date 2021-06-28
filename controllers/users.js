@@ -17,7 +17,7 @@ const getUsers = (req, res) => {
         res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при создании пользователя' });
         return;
       }
-      res.status(500).send({
+      res.status(ERR_CODE_INT_SER).send({
         message: 'Произошла ошибка',
       });
     });
@@ -37,7 +37,7 @@ const getUserId = (req, res) => {
         res.status(ERR_CODE_BAD_REQ).send({ message: 'Передан некорректный _id пользователя' });
         return;
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
+      res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -50,7 +50,7 @@ const createUser = (req, res) => {
         res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при создании пользователя' });
         return;
       }
-      res.status(500).send({
+      res.status(ERR_CODE_INT_SER).send({
         message: 'Произошла ошибка',
       });
     });
@@ -93,7 +93,7 @@ const updateUserAvatar = (req, res) => {
         res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при обновлении  аватара' });
         return;
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
+      res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
     });
 };
 
