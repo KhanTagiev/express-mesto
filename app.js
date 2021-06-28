@@ -7,7 +7,7 @@ const cardRoutes = require('./routes/cards');
 const {
   ERR_CODE_NOT_FOUND,
   MONGODB_URL,
-  MONGODB_OPTIONS
+  MONGODB_OPTIONS,
 } = require('./utils/constants');
 
 const app = express();

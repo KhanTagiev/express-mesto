@@ -8,7 +8,7 @@ const MONGODB_OPTIONS = {
   useCreateIndex: true,
   useFindAndModify: false,
   useUnifiedTopology: true,
-}
+};
 
 module.exports = {
   OK_CODE,
@@ -16,5 +16,5 @@ module.exports = {
   ERR_CODE_NOT_FOUND,
   ERR_CODE_INT_SER,
   MONGODB_URL,
-  MONGODB_OPTIONS
+  MONGODB_OPTIONS,
 };
