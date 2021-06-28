@@ -1,16 +1,23 @@
 const User = require('../models/user');
 
+const {
+  OK_CODE,
+  ERR_CODE_BAD_REQ,
+  ERR_CODE_NOT_FOUND,
+  ERR_CODE_INT_SER,
+} = require('../utils/constants');
+
 const getUsers = (req, res) => {
   User.find({})
     .then((user) => {
-      res.status(200).send(user);
+      res.status(OK_CODE).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
+        res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при создании пользователя' });
         return;
       }
-      res.status(500).send({
+      res.status(ERR_CODE_INT_SER).send({
         message: 'Произошла ошибка',
       });
     });
@@ -19,14 +26,18 @@ const getUsers = (req, res) => {
 const getUserId = (req, res) => {
   User.findById(req.params.userId)
     .then((user) => {
-      res.status(200).send(user);
+      if (!user) {
+        res.status(ERR_CODE_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден' });
+        return;
+      }
+      res.status(OK_CODE).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь по указанному _id не найден' });
+        res.status(ERR_CODE_BAD_REQ).send({ message: 'Передан некорректный _id пользователя' });
         return;
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
+      res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -36,10 +47,10 @@ const createUser = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
+        res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при создании пользователя' });
         return;
       }
-      res.status(500).send({
+      res.status(ERR_CODE_INT_SER).send({
         message: 'Произошла ошибка',
       });
     });
@@ -48,44 +59,41 @@ const createUser = (req, res) => {
 const updateUserProfile = (req, res) => {
   const { name, about } = req.body;
   const owner = req.user._id;
-  User.findByIdAndUpdate(owner, { name, about }, { new: true })
+  User.findByIdAndUpdate(owner, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+        res.status(ERR_CODE_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' });
         return;
       }
       res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля' });
+        res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при обновлении профиля' });
         return;
       }
-      res.status(500).send({
-        message: 'Произошла ошибка',
-      });
+
+      res.status(ERR_CODE_INT_SER).send(err);
     });
 };
 
 const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
   const owner = req.user._id;
-  User.findByIdAndUpdate(owner, { avatar }, { new: true })
+  User.findByIdAndUpdate(owner, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+        res.status(ERR_CODE_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' });
         return;
       }
       res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара' });
+        res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при обновлении  аватара' });
         return;
       }
-      res.status(500).send({
-        message: 'Произошла ошибка',
-      });
+      res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
     });
 };
 
