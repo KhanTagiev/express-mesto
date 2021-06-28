@@ -1,0 +1,11 @@
+const OK_CODE = 200;
+const ERR_CODE_BAD_REQ = 400;
+const ERR_CODE_NOT_FOUND = 404;
+const ERR_CODE_INT_SER = 404;
+
+module.exports = {
+  OK_CODE,
+  ERR_CODE_BAD_REQ,
+  ERR_CODE_NOT_FOUND,
+  ERR_CODE_INT_SER,
+};
