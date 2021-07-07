@@ -1,9 +1,11 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const {
   OK_CODE,
   ERR_CODE_BAD_REQ,
+  ERR_CODE_UN_AUTH,
   ERR_CODE_NOT_FOUND,
   ERR_CODE_INT_SER,
 } = require('../utils/constants');
@@ -31,6 +33,37 @@ const getUserId = async (req, res) => {
       return res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при создании пользователя' });
     }
     return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
+  }
+};
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(ERR_CODE_UN_AUTH).json({ message: 'Переданы некорректные данные пользователя' });
+    }
+
+    const isPasswordCorrect = bcrypt.compareSync(password, user.password);
+
+    if (!isPasswordCorrect) {
+      return res.status(ERR_CODE_UN_AUTH).json({ message: 'Переданы некорректные данные пользователя' });
+    }
+
+    const token = jwt.sign({ id: user._id }, 'secret', {
+      expiresIn: '7d',
+    });
+
+    res.cookie('jwt', token, {
+      maxAge: 10080000,
+      httpOnly: true,
+    });
+
+    return res.status(OK_CODE).send({ token });
+  } catch (err) {
+    return res.status(ERR_CODE_INT_SER).send({
+      message: 'Произошла ошибка',
+    });
   }
 };
 
@@ -108,6 +141,7 @@ const updateUserAvatar = async (req, res) => {
 module.exports = {
   getUsers,
   getUserId,
+  login,
   createUser,
   updateUserProfile,
   updateUserAvatar,

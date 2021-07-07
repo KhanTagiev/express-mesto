@@ -1,8 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
+const { login, createUser } = require('./controllers/users');
 
 const {
   ERR_CODE_NOT_FOUND,
@@ -25,9 +28,12 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use('/', userRoutes);
 app.use('/', cardRoutes);
+app.post('/signin', login);
+app.post('/signup', createUser);
 
 app.use((req, res) => {
   res.status(ERR_CODE_NOT_FOUND).send({ message: 'Страница не найдена' });
