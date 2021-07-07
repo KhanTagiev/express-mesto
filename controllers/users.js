@@ -81,7 +81,7 @@ const updateUserProfile = async (req, res) => {
     if (err.name === 'ValidationError') {
       return res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при обновлении профиля' });
     }
-    return res.status(ERR_CODE_INT_SER).send(err);
+    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
   }
 };
 
@@ -101,7 +101,7 @@ const updateUserAvatar = async (req, res) => {
     if (err.name === 'ValidationError') {
       return res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при обновлении  аватара' });
     }
-    return res.status(ERR_CODE_INT_SER).send(err);
+    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
   }
 };
 
