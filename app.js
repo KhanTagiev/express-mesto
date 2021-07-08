@@ -1,36 +1,61 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const { celebrate, Joi, errors } = require('celebrate');
+
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
+const { login, createUser } = require('./controllers/users');
 
 const {
   ERR_CODE_NOT_FOUND,
   MONGODB_URL,
   MONGODB_OPTIONS,
 } = require('./utils/constants');
+const NotFoundError = require('./errors/not-found-err');
 
 const app = express();
 const { PORT = 3000 } = process.env;
 
 mongoose.connect(MONGODB_URL, MONGODB_OPTIONS);
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '60d5c8cc8ac2e78a63ccf068',
-  };
-
-  next();
-});
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use('/', userRoutes);
 app.use('/', cardRoutes);
 
-app.use((req, res) => {
-  res.status(ERR_CODE_NOT_FOUND).send({ message: 'Страница не найдена' });
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2),
+    avatar: Joi.string(),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), createUser);
+
+app.use((req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
+});
+
+app.use(errors());
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send({
+    message: statusCode === 500
+      ? 'На сервере произошла ошибка'
+      : message,
+  });
 });
 
 app.listen(PORT, () => {
