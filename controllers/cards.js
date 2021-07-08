@@ -2,6 +2,7 @@ const Card = require('../models/card');
 const {
   OK_CODE,
   ERR_CODE_BAD_REQ,
+  ERR_CODE_UN_AUTH,
   ERR_CODE_NOT_FOUND,
   ERR_CODE_INT_SER,
 } = require('../utils/constants');
@@ -35,12 +36,17 @@ const createCard = async (req, res) => {
 
 const deleteCardId = async (req, res) => {
   try {
-    const card = await Card.findByIdAndRemove(req.params.cardId);
-
+    const card = await Card.findById(req.params.cardId);
     if (!card) {
       return res.status(ERR_CODE_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
     }
-    return res.status(OK_CODE).send(card);
+
+    if (String(card.owner) !== req.user._id) {
+      return res.status(ERR_CODE_UN_AUTH).send({ message: 'Карточка не создана вами' });
+    }
+    const cardDelete = await Card.findByIdAndRemove(req.params.cardId);
+
+    return res.status(OK_CODE).send(cardDelete);
   } catch (err) {
     if (err.name === 'CastError') {
       return res.status(ERR_CODE_BAD_REQ).send({ message: 'Карточка с указанным _id не найдена' });
