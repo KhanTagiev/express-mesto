@@ -5,7 +5,7 @@ const { OK_CODE } = require('../utils/constants');
 const NotFoundError = require('../errors/not-found-err');
 const UnAuthErr = require('../errors/un_auth_err');
 const BadReqErr = require('../errors/bad-req-err');
-const ConflictErr = require('../errors/conflict-err');
+const ForbiddenErr = require('../errors/forbidden-err');
 
 const getCards = async (req, res, next) => {
   try {
@@ -34,7 +34,7 @@ const deleteCardId = async (req, res, next) => {
     const card = await Card.findById(req.params.cardId);
     if (!card) { return next(new NotFoundError('Карточка с указанным _id не найдена')); }
 
-    if (String(card.owner) !== req.user._id) { return next(new UnAuthErr('Карточка не создана вами')); }
+    if (String(card.owner) !== req.user._id) { return next(new ForbiddenErr('Карточка не создана вами')); }
 
     const cardDelete = await Card.findByIdAndRemove(req.params.cardId);
 
