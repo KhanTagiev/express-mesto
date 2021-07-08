@@ -11,6 +11,7 @@ const MONGODB_OPTIONS = {
   useFindAndModify: false,
   useUnifiedTopology: true,
 };
+const REGEX = /https?:\/\/[\w{1,}\W{1,}]+\/[\w{1,}\W{1,}]+.(jpg|jpeg|png|svg|gif|webp)#?\b/;
 const SECRET_CODE = '$2b$12$oqWagOvBFEB.h3qpzEWpOuOWtSFFwyAXZ4N/mIw68ENbctx9OCyoy';
 
 module.exports = {
@@ -22,5 +23,6 @@ module.exports = {
   ERR_CODE_INT_SER,
   MONGODB_URL,
   MONGODB_OPTIONS,
+  REGEX,
   SECRET_CODE,
 };
