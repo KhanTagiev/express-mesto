@@ -74,7 +74,13 @@ const createUser = async (req, res, next) => {
 
     await user.save();
 
-    return res.send(user);
+    return res.send({
+      name: user.name,
+      about: user.about,
+      _id: user._id,
+      avatar: user.avatar,
+      email: user.email,
+    });
   } catch (err) {
     if (err.name === 'ValidationError') { return next(new BadReqErr('Переданы некорректные данные для создания пользователя')); }
 
