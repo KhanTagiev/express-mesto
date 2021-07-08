@@ -10,7 +10,7 @@ const MONGODB_OPTIONS = {
   useFindAndModify: false,
   useUnifiedTopology: true,
 };
-const SECRET_CODE = '$2b$12$oqWagOvBFEB.h3qpzEWpOuOWtSFFwyAXZ4N/mIw68ENbctx9OCyoy'
+const SECRET_CODE = '$2b$12$oqWagOvBFEB.h3qpzEWpOuOWtSFFwyAXZ4N/mIw68ENbctx9OCyoy';
 
 module.exports = {
   OK_CODE,
@@ -20,5 +20,5 @@ module.exports = {
   ERR_CODE_INT_SER,
   MONGODB_URL,
   MONGODB_OPTIONS,
-  SECRET_CODE
+  SECRET_CODE,
 };

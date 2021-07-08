@@ -8,7 +8,7 @@ const {
   ERR_CODE_UN_AUTH,
   ERR_CODE_NOT_FOUND,
   ERR_CODE_INT_SER,
-  SECRET_CODE
+  SECRET_CODE,
 } = require('../utils/constants');
 
 const getUsers = async (req, res) => {
@@ -33,7 +33,7 @@ const getUserId = async (req, res) => {
     if (err.name === 'ValidationError') {
       return res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при создании пользователя' });
     }
-    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка'});
+    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
   }
 };
 
@@ -48,9 +48,9 @@ const getMeProfile = async (req, res) => {
     if (err.name === 'ValidationError') {
       return res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при создании пользователя' });
     }
-    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка'});
+    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
   }
-}
+};
 
 const login = async (req, res) => {
   try {
