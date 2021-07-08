@@ -8,6 +8,7 @@ const {
   ERR_CODE_UN_AUTH,
   ERR_CODE_NOT_FOUND,
   ERR_CODE_INT_SER,
+  SECRET_CODE
 } = require('../utils/constants');
 
 const getUsers = async (req, res) => {
@@ -65,7 +66,7 @@ const login = async (req, res) => {
       return res.status(ERR_CODE_UN_AUTH).json({ message: 'Переданы некорректные данные пользователя' });
     }
 
-    const token = jwt.sign({ _id: user._id }, 'secret', {
+    const token = jwt.sign({ _id: user._id }, SECRET_CODE, {
       expiresIn: '7d',
     });
 
