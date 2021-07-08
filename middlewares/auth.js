@@ -1,20 +1,15 @@
 const jwt = require('jsonwebtoken');
-const {
-  ERR_CODE_UN_AUTH,
-  ERR_CODE_INT_SER,
-  SECRET_CODE,
-} = require('../utils/constants');
+const { SECRET_CODE } = require('../utils/constants');
+
+const UnAuthErr = require('../errors/un_auth_err');
 
 module.exports = async (req, res, next) => {
   try {
     const token = req.cookies.jwt;
-    if (!token) {
-      return res.status(ERR_CODE_UN_AUTH).json({ message: 'Ошибка при авторизации' });
-    }
+    if (!token) { return next(new UnAuthErr('Ошибка при авторизации')); }
+
     const payload = jwt.verify(token, SECRET_CODE);
     req.user = payload;
     return next();
-  } catch (err) {
-    return res.status(ERR_CODE_INT_SER).json({ message: 'Ошибка при авторизации' });
-  }
+  } catch (err) { return next(err); }
 };

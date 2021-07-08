@@ -12,6 +12,7 @@ const {
   MONGODB_URL,
   MONGODB_OPTIONS,
 } = require('./utils/constants');
+const NotFoundError = require('./errors/not-found-err');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -27,8 +28,17 @@ app.use('/', cardRoutes);
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-app.use((req, res) => {
-  res.status(ERR_CODE_NOT_FOUND).send({ message: 'Страница не найдена' });
+app.use((req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
+});
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send({
+    message: statusCode === 500
+      ? 'На сервере произошла ошибка'
+      : message,
+  });
 });
 
 app.listen(PORT, () => {

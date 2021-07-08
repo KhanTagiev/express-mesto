@@ -1,61 +1,52 @@
 const Card = require('../models/card');
-const {
-  OK_CODE,
-  ERR_CODE_BAD_REQ,
-  ERR_CODE_UN_AUTH,
-  ERR_CODE_NOT_FOUND,
-  ERR_CODE_INT_SER,
-} = require('../utils/constants');
 
-const getCards = async (req, res) => {
+const { OK_CODE } = require('../utils/constants');
+
+const NotFoundError = require('../errors/not-found-err');
+const UnAuthErr = require('../errors/un_auth_err');
+const BadReqErr = require('../errors/bad-req-err');
+const ConflictErr = require('../errors/conflict-err');
+
+const getCards = async (req, res, next) => {
   try {
     return res.status(OK_CODE).send(await Card.find({}));
-  } catch (err) {
-    if (err.name === 'ValidationError') {
-      return res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при создании карточки' });
-    }
-    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
-  }
+  } catch (err) { return next(err); }
 };
 
-const createCard = async (req, res) => {
+const createCard = async (req, res, next) => {
   try {
     const { name, link } = req.body;
     const owner = req.user._id;
     const card = new Card({ name, link, owner });
 
     await card.save();
+
     return res.send(card);
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      return res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при создании карточки' });
-    }
-    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
+    if (err.name === 'ValidationError') { return next(new BadReqErr('Переданы некорректные данные при создании карточки')); }
+
+    return next(err);
   }
 };
 
-const deleteCardId = async (req, res) => {
+const deleteCardId = async (req, res, next) => {
   try {
     const card = await Card.findById(req.params.cardId);
-    if (!card) {
-      return res.status(ERR_CODE_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
-    }
+    if (!card) { return next(new NotFoundError('Карточка с указанным _id не найдена')); }
 
-    if (String(card.owner) !== req.user._id) {
-      return res.status(ERR_CODE_UN_AUTH).send({ message: 'Карточка не создана вами' });
-    }
+    if (String(card.owner) !== req.user._id) { return next(new UnAuthErr('Карточка не создана вами')); }
+
     const cardDelete = await Card.findByIdAndRemove(req.params.cardId);
 
     return res.status(OK_CODE).send(cardDelete);
   } catch (err) {
-    if (err.name === 'CastError') {
-      return res.status(ERR_CODE_BAD_REQ).send({ message: 'Карточка с указанным _id не найдена' });
-    }
-    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
+    if (err.name === 'CastError') { return next(new BadReqErr('Передан некорректный _id карточки')); }
+
+    return next(err);
   }
 };
 
-const likeCard = async (req, res) => {
+const likeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -63,19 +54,17 @@ const likeCard = async (req, res) => {
       { new: true },
     );
 
-    if (!card) {
-      return res.status(ERR_CODE_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
-    }
+    if (!card) { return next(new NotFoundError('Карточка с указанным _id не найдена')); }
+
     return res.status(OK_CODE).send(card);
   } catch (err) {
-    if (err.name === 'CastError') {
-      return res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные для постановки лайка.' });
-    }
-    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
+    if (err.name === 'CastError') { return next(new BadReqErr('Переданы некорректные данные для постановки лайка')); }
+
+    return next(err);
   }
 };
 
-const dislikeCard = async (req, res) => {
+const dislikeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -83,17 +72,16 @@ const dislikeCard = async (req, res) => {
       { new: true },
     );
 
-    if (!card) {
-      return res.status(ERR_CODE_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
-    }
+    if (!card) { return next(new NotFoundError('Карточка с указанным _id не найдена')); }
+
     return res.status(OK_CODE).send(card);
   } catch (err) {
-    if (err.name === 'CastError') {
-      return res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные для снятия лайка.' });
-    }
-    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
+    if (err.name === 'CastError') { return next(new BadReqErr('Переданы некорректные данные для постановки лайка')); }
+
+    return next(err);
   }
 };
+
 module.exports = {
   getCards,
   createCard,
