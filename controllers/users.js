@@ -32,9 +32,24 @@ const getUserId = async (req, res) => {
     if (err.name === 'ValidationError') {
       return res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при создании пользователя' });
     }
-    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка' });
+    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка'});
   }
 };
+
+const getMeProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(ERR_CODE_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден' });
+    }
+    return res.status(OK_CODE).send(user);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return res.status(ERR_CODE_BAD_REQ).send({ message: 'Переданы некорректные данные при создании пользователя' });
+    }
+    return res.status(ERR_CODE_INT_SER).send({ message: 'Произошла ошибка'});
+  }
+}
 
 const login = async (req, res) => {
   try {
@@ -50,7 +65,7 @@ const login = async (req, res) => {
       return res.status(ERR_CODE_UN_AUTH).json({ message: 'Переданы некорректные данные пользователя' });
     }
 
-    const token = jwt.sign({ id: user._id }, 'secret', {
+    const token = jwt.sign({ _id: user._id }, 'secret', {
       expiresIn: '7d',
     });
 
@@ -141,6 +156,7 @@ const updateUserAvatar = async (req, res) => {
 module.exports = {
   getUsers,
   getUserId,
+  getMeProfile,
   login,
   createUser,
   updateUserProfile,

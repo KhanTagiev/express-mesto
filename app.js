@@ -18,14 +18,6 @@ const { PORT = 3000 } = process.env;
 
 mongoose.connect(MONGODB_URL, MONGODB_OPTIONS);
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '60e5b26cd0ecc6317611bcfe',
-  };
-
-  next();
-});
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
