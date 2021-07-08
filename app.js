@@ -15,6 +15,8 @@ const {
 } = require('./utils/constants');
 const NotFoundError = require('./errors/not-found-err');
 
+const urlValidationMethod = require('./utils/url_valid_meth');
+
 const app = express();
 const { PORT = 3000 } = process.env;
 
@@ -37,7 +39,7 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2),
-    avatar: Joi.string(),
+    avatar: Joi.string().custom(urlValidationMethod),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }),
