@@ -13,7 +13,7 @@ const cardSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator(v) {
-        return validator.isURL(v);
+        return validator.isURL(v, { require_protocol: true });
       },
       message: 'Ссылка на картинку имеет некорректный формат',
     },
