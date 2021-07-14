@@ -17,11 +17,14 @@ const NotFoundError = require('./errors/not-found-err');
 
 const urlValidationMethod = require('./utils/url_valid_meth');
 
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+
 const app = express();
 const { PORT = 3000 } = process.env;
 
 mongoose.connect(MONGODB_URL, MONGODB_OPTIONS);
 
+app.use(requestLogger);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -38,7 +41,7 @@ app.post('/signin', celebrate({
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2),
+    about: Joi.string().min(2).max(30),
     avatar: Joi.string().custom(urlValidationMethod),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
@@ -48,6 +51,8 @@ app.post('/signup', celebrate({
 app.use((req, res, next) => {
   next(new NotFoundError('Страница не найдена'));
 });
+
+app.use(errorLogger);
 
 app.use(errors());
 
